@@ -1,6 +1,8 @@
-from env import env
 import numpy as np
 import random
+
+from env import env
+from .grid import EmptyGrid, TerminalGrid, WallGrid
 
 
 class SimpleMaze(env.GridWorld):
@@ -13,18 +15,29 @@ class SimpleMaze(env.GridWorld):
         self.start_pos = [0, 0]
         self.goal_pos_list = [(5, 7), (9, 1)]
         self.barrier_pos_list = [(6, 6), (2, 3), (5, 5)]
+        self.__init_grids(grid_size)
         self.reset()
 
     def __build_maze(self, start_pos, goal_pos_list, barrier_pos_list):
         self.__init_start_pos(start_pos)
         self.__init_goal_state(goal_pos_list)
         self.__init_barrier(barrier_pos_list)
+        # self.maze = np.zeros(self.grid_size)
+        # for goal_pos in self.goal_pos_list:
+        #     self.maze[goal_pos] = 3
+        # for barrier_pos in self.barrier_pos_list:
+        #     self.maze[barrier_pos] = 2
 
-        self.maze = np.zeros(self.grid_size)
-        for goal_pos in self.goal_pos_list:
-            self.maze[goal_pos] = 3
-        for barrier_pos in self.barrier_pos_list:
-            self.maze[barrier_pos] = 2
+    def __init_grids(self, grid_size):
+        self.maze_grids = []
+        for y in grid_size[0]:
+            self.maze_grids.append([])
+            for x in grid_size[1]:
+                self.maze_grids[grid_size[0]-1].append(EmptyGrid(grid_size[1]-1, grid_size[0]-1))
+
+        print(self.maze_grids)
+
+
 
     def __init_start_pos(self, start_pos=(0, 0)):
         self.agent_pos = start_pos
@@ -103,13 +116,4 @@ class SimpleMaze(env.GridWorld):
 
 if __name__ == '__main__':
     env = SimpleMaze()
-    s = env.reset()
 
-    for step in range(10000):
-        action = random.randint(0, 3)
-        s_, reward, done = env.step(action)
-        print(s, action, reward, s_)
-        s = s_
-        if done:
-            print("done", step)
-            break
