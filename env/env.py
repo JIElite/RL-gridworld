@@ -1,4 +1,3 @@
-import tkinter as tk
 from abc import abstractmethod
 
 
@@ -14,11 +13,9 @@ class Environment:
     def __is_terminal(self):
         pass
 
-    def __init_render(self, render=False):
-        if render:
-            self.renderer = tk.Tk()
-        else:
-            self.renderer = None
+    @abstractmethod
+    def __init_render(self, render):
+        pass
 
     @abstractmethod
     def reset(self):
@@ -44,9 +41,9 @@ class Environment:
 
 
 class GridWorld(Environment):
-
-    def __init__(self):
-        super(GridWorld, self).__init__()
+    def __init__(self, render=False):
+        super(GridWorld, self).__init__(render)
+        self.agent_state = None
 
     @abstractmethod
     def __init_start_pos(self, start_pos):
@@ -54,4 +51,8 @@ class GridWorld(Environment):
 
     @abstractmethod
     def __init_goal_pos(self, goal_pos_list):
+        pass
+
+    @abstractmethod
+    def __init_grids(self):
         pass
