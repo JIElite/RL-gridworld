@@ -9,25 +9,28 @@ from env.agent import GridAgent
 
 class SimpleMaze(env.GridWorld):
     def __init__(self, grid_size=(10, 10), unit_size=40, render=False):
-        # super(SimpleMaze, self).__init__(render)
         self.action_space = np.array(['up', 'down', 'left', 'right'])
         self.observation_space = np.array(['x', 'y'])
         self.grid_size = grid_size
         self.unit_size = unit_size
+        self.renderable = render
+        self.canvas = None
 
         # initialize maze
         self.goal_pos_list = [(5, 7), (9, 1)]
         self.barrier_pos_list = [(1, 1), (1, 2), (2, 1)]
         self.__build_maze(self.goal_pos_list, self.barrier_pos_list)
 
+        # using maze info. to init canvas renderer
+        self.__init_render()
+
         # initialize agent's state
-        self.start_pos = (0, 0)
-        self.reset()
-        self.__init_render(render)
+        self.__init_start_pos((0, 0))
+        self.agent = GridAgent(self.start_pos[0], self.start_pos[1], self.canvas)
 
     def __build_maze(self, goal_pos_list, barrier_pos_list):
-        self.__init_goal_state(goal_pos_list)
-        self.__init_barrier(barrier_pos_list)
+        self.__init_goal_pos(goal_pos_list)
+        self.__init_barrier_pos(barrier_pos_list)
         self.__init_grids()
         for goal_pos in self.goal_pos_list:
             x, y = goal_pos[0], goal_pos[1]
@@ -37,11 +40,14 @@ class SimpleMaze(env.GridWorld):
             x, y = barrier_pos[0], barrier_pos[1]
             self.maze_grids[y][x] = WallGrid(x, y)
 
-    def __init_barrier(self, barrier_list):
-        self.barrier_pos_list = barrier_list
+    def __init_start_pos(self, start_pos):
+        self.start_pos = start_pos
 
-    def __init_goal_state(self, goal_pos_list):
+    def __init_goal_pos(self, goal_pos_list):
         self.goal_pos_list = goal_pos_list
+
+    def __init_barrier_pos(self, barrier_pos_list):
+        self.barrier_pos_list = barrier_pos_list
 
     def __init_grids(self):
         self.maze_grids = []
@@ -52,7 +58,7 @@ class SimpleMaze(env.GridWorld):
 
     def reset(self):
         # initialize agent state, and return the observation
-        self.agent = GridAgent(self.start_pos[0], self.start_pos[1])
+        self.agent.reset()
         return self.agent.get_current_state()
 
     def get_action_space(self):
@@ -110,14 +116,14 @@ class SimpleMaze(env.GridWorld):
 
     def __compute_reward(self, state, action):
         if self.__is_terminal():
-            reward = 0
+            reward = 20
         else:
             reward = -1
 
         return reward
 
-    def __init_render(self, render):
-        if render:
+    def __init_render(self):
+        if self.renderable:
             self.renderer = tk.Tk()
             self.renderer.title('SimpleMaze')
             self.renderer.geometry('{0}x{1}'.format(
@@ -148,6 +154,5 @@ class SimpleMaze(env.GridWorld):
         if not (self.renderer and self.canvas):
             raise ValueError('Renderer does not exist!')
 
-        self.agent.render(self.canvas, self.unit_size)
+        self.agent.render(self.unit_size)
         self.renderer.update()
-
