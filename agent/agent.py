@@ -1,4 +1,3 @@
-from agent.IMemorizable import IMemorizable
 import random
 from abc import abstractmethod
 
@@ -17,7 +16,6 @@ class Agent:
 
 
 class RandomDiscreteAgent(Agent):
-
     def __init__(self, n_actions):
         self.set_action_space(n_actions)
 
