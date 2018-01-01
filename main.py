@@ -1,20 +1,35 @@
-from env.simple_maze import SimpleMaze
-from agent.agent import  RandomDiscreteAgent
+from maze.simple_maze import SimpleMaze
+from agent.A2C import A2CAgent
 
+import time
 
-env = SimpleMaze()
-MAX_STEPS = 1000
+env = SimpleMaze(render=True)
 N_ACTIONS = env.get_action_space()[1][0]
+N_STATES = env.get_state_space()[1][0]
+LR = 5e-4
+MAX_EPISODES = 200
+MAX_STEPS = 200
 
+G_list = []
+max_G = -200
+agent = A2CAgent(n_states=N_STATES, n_actions=N_ACTIONS, lr=LR)
+agent.load_model()
+for i_episode in range(MAX_EPISODES):
+    s = env.reset()
+    G = 0
+    for step in range(1, MAX_STEPS+1):
+        env.render()
+        action = agent.select_action(s)
+        s_, reward, done = env.step(action)
+        experience = (s, action, reward, s_, not done)
 
-agent = RandomDiscreteAgent(n_actions=N_ACTIONS)
-s = env.reset()
-for step in range(MAX_STEPS):
-    action = agent.select_action(s)
-    s_, reward, done = env.step(action)
-    s = s_
-
-    if done:
-        print("done", step)
-        break
-
+        # agent.learn(experience)
+        G += reward
+        if done or step == MAX_STEPS:
+            # if max_G < G:
+            #     agent.save_model()
+            #     max_G = G
+            env.render()
+            print('{0} done, using {1} steps'.format(i_episode, step))
+            G_list.append(G)
+            break
