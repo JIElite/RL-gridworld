@@ -2,9 +2,6 @@ from abc import abstractmethod
 
 
 class Environment:
-    def __init__(self, render=False):
-        self.__init_render(render)
-
     @abstractmethod
     def __compute_reward(self, state, action):
         pass
@@ -14,7 +11,7 @@ class Environment:
         pass
 
     @abstractmethod
-    def __init_render(self, render):
+    def __init_render(self):
         pass
 
     @abstractmethod
@@ -41,10 +38,6 @@ class Environment:
 
 
 class GridWorld(Environment):
-    def __init__(self, render=False):
-        super(GridWorld, self).__init__(render)
-        self.agent_state = None
-
     @abstractmethod
     def __init_start_pos(self, start_pos):
         pass
