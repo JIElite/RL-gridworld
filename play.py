@@ -12,11 +12,11 @@ agent = RandomDiscreteAgent(n_actions=N_ACTIONS)
 for i_episode in range(MAX_EPISODES):
     s = env.reset()
     for step in range(1, MAX_STEPS+1):
-        env.render()
+        # env.render()
         action = agent.select_action(s)
         s_, reward, done = env.step(action)
 
         if done or step == MAX_STEPS:
-            env.render()
+            # env.render()
             print('Episode:{0} done. step:{1}'.format(i_episode, step))
             break
