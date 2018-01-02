@@ -30,7 +30,7 @@ Just run the `play.py`
 ```
 (venv)$ python play.py
 ```
-![](./images/simplemaze.png)
+![](./images/demo.gif)
 
 ## License
 The MIT License
