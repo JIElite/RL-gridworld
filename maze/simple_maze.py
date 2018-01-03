@@ -1,71 +1,59 @@
-import tkinter as tk
-
 import numpy as np
 
 from env import env
-from env.grid import EmptyGrid, TerminalGrid, WallGrid
+from env.grid import TerminalGrid, WallGrid
 from env.agent import GridAgent
 
 
 class SimpleMaze(env.GridWorld):
     def __init__(self, grid_size=(10, 10), unit_size=40, render=False):
-        self.action_space = np.array(['up', 'down', 'left', 'right'])
-        self.observation_space = np.array(['x', 'y'])
-        self.grid_size = grid_size
-        self.unit_size = unit_size
-        self.renderable = render
-        self.canvas = None
-
-        # initialize maze
-        self.goal_pos_list = [(5, 7), (9, 1)]
-        self.barrier_pos_list = [(1, 1), (1, 2), (2, 1)]
-        self.__build_maze(self.goal_pos_list, self.barrier_pos_list)
-
-        # using maze info. to init canvas renderer
-        self.__init_render()
-
-        # initialize agent's state
-        self.__init_start_pos((0, 0))
+        super(SimpleMaze, self).__init__(grid_size=grid_size, unit_size=unit_size, render=render)
+        self.__init_grid_world()
+        self.set_action_space(np.array(['up', 'down', 'left', 'right']))
+        self.set_state_space(np.array(['x', 'y']))
         self.agent = GridAgent(self.start_pos[0], self.start_pos[1], self.canvas)
 
-    def __build_maze(self, goal_pos_list, barrier_pos_list):
-        self.__init_goal_pos(goal_pos_list)
-        self.__init_barrier_pos(barrier_pos_list)
-        self.__init_grids()
+    def __init_grid_world(self):
+        self.__init_start_pos()
+        self.__init_goal_pos()
+        self.__init_wall_pos()
+
+        self.init_empty_grids()
+        self.__init_goal_grids()
+        self.__init_wall_grids()
+
+        if self.renderable:
+            self.draw_grid_worlds()
+
+    def __init_start_pos(self):
+        self.start_pos = (0, 0)
+
+    def __init_goal_pos(self):
+        self.goal_pos_list = [(5, 7), (9, 1)]
+
+    def __init_goal_grids(self):
         for goal_pos in self.goal_pos_list:
             x, y = goal_pos[0], goal_pos[1]
             self.maze_grids[y][x] = TerminalGrid(x, y)
 
-        for barrier_pos in self.barrier_pos_list:
-            x, y = barrier_pos[0], barrier_pos[1]
+    def __init_wall_pos(self):
+        self.wall_pos_list = [(1, 1), (1, 2), (2, 1)]
+
+    def __init_wall_grids(self):
+        for wall_pos in self.wall_pos_list:
+            x, y = wall_pos[0], wall_pos[1]
             self.maze_grids[y][x] = WallGrid(x, y)
-
-    def __init_start_pos(self, start_pos):
-        self.start_pos = start_pos
-
-    def __init_goal_pos(self, goal_pos_list):
-        self.goal_pos_list = goal_pos_list
-
-    def __init_barrier_pos(self, barrier_pos_list):
-        self.barrier_pos_list = barrier_pos_list
-
-    def __init_grids(self):
-        self.maze_grids = []
-        for y in range(self.grid_size[1]):
-            self.maze_grids.append([])
-            for x in range(self.grid_size[0]):
-                self.maze_grids[y].append(EmptyGrid(x, y))
 
     def reset(self):
         # initialize agent state, and return the observation
         self.agent.reset()
-        return self.agent.get_current_state()
+        return self.get_state()
 
     def get_action_space(self):
         return self.action_space, self.action_space.shape
 
     def get_state_space(self):
-        return self.observation_space, self.observation_space.shape
+        return self.state_space, self.state_space.shape
 
     def step(self, action):
 
@@ -109,7 +97,7 @@ class SimpleMaze(env.GridWorld):
 
         done = self.__is_terminal()
         reward = self.__compute_reward(self.agent.get_previous_state(), action)
-        return self.agent.get_current_state(), reward, done
+        return self.get_state(), reward, done
 
     def __is_terminal(self):
         return self.agent.get_current_state() in self.goal_pos_list
@@ -119,40 +107,10 @@ class SimpleMaze(env.GridWorld):
             reward = 20
         else:
             reward = -1
-
         return reward
-
-    def __init_render(self):
-        if self.renderable:
-            self.renderer = tk.Tk()
-            self.renderer.title('SimpleMaze')
-            self.renderer.geometry('{0}x{1}'.format(
-                self.grid_size[1]*self.unit_size,
-                self.grid_size[1]*self.unit_size,
-            ))
-            self.canvas = tk.Canvas(self.renderer, bg='white',
-                                    height=self.grid_size[1]*self.unit_size,
-                                    width=self.grid_size[1]*self.unit_size
-                                    )
-            self.canvas.pack()
-
-            for c in range(0, self.grid_size[0] * self.unit_size, self.unit_size):
-                x0, y0, x1, y1 = c, 0, c, self.grid_size[0] * self.unit_size
-                self.canvas.create_line(x0, y0, x1, y1)
-            for r in range(0, self.grid_size[1] * self.unit_size, self.unit_size):
-                x0, y0, x1, y1 = 0, r, self.grid_size[1] * self.unit_size, r
-                self.canvas.create_line(x0, y0, x1, y1)
-
-            for y in range(self.grid_size[1]):
-                for x in range(self.grid_size[0]):
-                    self.maze_grids[y][x].render(self.canvas, self.unit_size)
-
-        else:
-            self.renderer = None
 
     def render(self):
         if not (self.renderer and self.canvas):
             raise ValueError('Renderer does not exist!')
-
         self.agent.render(self.unit_size)
         self.renderer.update()

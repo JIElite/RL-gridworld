@@ -45,7 +45,6 @@ class TerminalGrid(Grid):
             fill='yellow'
         )
 
-
     def is_terminal(self):
         return True
 
