@@ -35,7 +35,7 @@ class EmptyGrid(Grid):
         pass
 
 
-class TerminalGrid(Grid):
+class GoalGrid(Grid):
     def effect(self, agent_state):
         return agent_state
 

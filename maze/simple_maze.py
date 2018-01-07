@@ -1,45 +1,45 @@
 import numpy as np
 
 from env import env
-from env.grid import TerminalGrid, WallGrid
+from env.grid import GoalGrid, WallGrid
 from env.agent import GridAgent
 
 
 class SimpleMaze(env.GridWorld):
     def __init__(self, grid_size=(10, 10), unit_size=40, render=False):
         super(SimpleMaze, self).__init__(grid_size=grid_size, unit_size=unit_size, render=render)
-        self.__init_grid_world()
+        self.init_grid_world()
         self.set_action_space(np.array(['up', 'down', 'left', 'right']))
         self.set_state_space(np.array(['x', 'y']))
         self.agent = GridAgent(self.start_pos[0], self.start_pos[1], self.canvas)
 
-    def __init_grid_world(self):
-        self.__init_start_pos()
-        self.__init_goal_pos()
-        self.__init_wall_pos()
+    def init_grid_world(self):
+        self.init_start_pos()
+        self.init_goal_pos()
+        self.init_wall_pos()
 
         self.init_empty_grids()
-        self.__init_goal_grids()
-        self.__init_wall_grids()
+        self.init_goal_grids()
+        self.init_wall_grids()
 
         if self.renderable:
             self.draw_grid_worlds()
 
-    def __init_start_pos(self):
+    def init_start_pos(self):
         self.start_pos = (0, 0)
 
-    def __init_goal_pos(self):
+    def init_goal_pos(self):
         self.goal_pos_list = [(5, 7), (9, 1)]
 
-    def __init_goal_grids(self):
+    def init_goal_grids(self):
         for goal_pos in self.goal_pos_list:
             x, y = goal_pos[0], goal_pos[1]
-            self.maze_grids[y][x] = TerminalGrid(x, y)
+            self.maze_grids[y][x] = GoalGrid(x, y)
 
-    def __init_wall_pos(self):
+    def init_wall_pos(self):
         self.wall_pos_list = [(1, 1), (1, 2), (2, 1)]
 
-    def __init_wall_grids(self):
+    def init_wall_grids(self):
         for wall_pos in self.wall_pos_list:
             x, y = wall_pos[0], wall_pos[1]
             self.maze_grids[y][x] = WallGrid(x, y)

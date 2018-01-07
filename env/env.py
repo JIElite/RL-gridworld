@@ -68,15 +68,15 @@ class GridWorld(Environment):
         self.__init__render()
 
     @abstractmethod
-    def __init_start_pos(self):
+    def init_start_pos(self):
         pass
 
     @abstractmethod
-    def __init_goal_pos(self):
+    def init_goal_pos(self):
         pass
 
     @abstractmethod
-    def __init_grid_world(self):
+    def init_grid_world(self):
         pass
 
     def __init__render(self):

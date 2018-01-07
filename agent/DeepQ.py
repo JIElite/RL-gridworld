@@ -9,6 +9,7 @@ from .agent import Agent
 from .memory import DeepQReplayBuffer
 from .utils import soft_update_network
 
+
 class Network(nn.Module):
     def __init__(self, n_states, n_actions):
         super(Network, self).__init__()
@@ -23,8 +24,7 @@ class Network(nn.Module):
 
 
 class DeepQAgent(Agent):
-    def __init__(self, n_states, n_actions, lr=2e-3, gamma=0.99, memory_size=10000,
-                 epsilon=1.0, min_epsilon=0.1, decay_step=10000):
+    def __init__(self, n_states, n_actions, lr=2e-3, gamma=0.99, memory_size=10000, epsilon=1.0, min_epsilon=0.1, decay_step=10000):
         self.lr = lr
         self.gamma = gamma
         self.epsilon = epsilon
